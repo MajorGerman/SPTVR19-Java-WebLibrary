@@ -1,6 +1,6 @@
 <%-- 
-    Document   : index
-    Created on : 24.11.2020, 14:32:31
+    Document   : bookList
+    Created on : 26.11.2020, 15:05:47
     Author     : user
 --%>
 
@@ -10,15 +10,11 @@
     <head>
         <link type="text/css" rel="stylesheet" href="style.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Главная</title>
+        <title>JSP Page</title>
     </head>
     <body>
         <h2> [ Библиотека Георга Лаабе ] </h2>
-        <p>${info}</p>
-        <a href="addBook"> > Добавить книгу </a><br>
-        <a href="addUser"> > Добавить пользователя </a><br>
-        <a href="bookList"> > Список книг </a><br>      
+        <h3> Список Книг </h3>
+        ${books}
     </body>
-    <script>             
-    </script>
 </html>

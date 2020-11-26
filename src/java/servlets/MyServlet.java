@@ -6,6 +6,8 @@ import entity.User;
 import entity.UserFacade;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,13 +15,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "MyServlet", urlPatterns = {"/addBook", "/createBook", "/addUser", "/createUser"})
+@WebServlet(name = "MyServlet", urlPatterns = {"/addBook", "/createBook", "/addUser", "/createUser", "/bookList"})
 public class MyServlet extends HttpServlet {
     
     @EJB 
     private BookFacade bookFacade;
     @EJB
     private UserFacade userFacade;
+    
+    List<Book> array = new ArrayList<>();
+    
+    String books = "";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
@@ -71,9 +77,20 @@ public class MyServlet extends HttpServlet {
                 userFacade.create(user);
                 request.setAttribute("info", "Пользователь был добавлен! (" + name + " '" + nick + "' " + surname + ", " + phone + ")");
                 request.getRequestDispatcher("/index.jsp").forward(request, response);                
-                break;                
-           }
+                break;                          
+            case "/bookList":
+                array = bookFacade.findAll();
+                books = "";
+                for (int i = 0; i < array.size(); i++) {
+                    books += "<div> '" + array.get(i).getName() + "' (" + array.get(i).getAuthor() + ", " + array.get(i).getYear() + "г.)</div>";
+                    System.out.println(books);
+                }
+                request.setAttribute("books", books);
+                request.getRequestDispatcher("/WEB-INF/bookList.jsp").forward(request, response);  
+                break;
+    
         }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

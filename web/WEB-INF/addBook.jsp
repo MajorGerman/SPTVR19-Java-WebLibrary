@@ -13,8 +13,8 @@
         <title>Добавление книги</title>
     </head>
     <body>
-        <h1> [ Библиотека Георга Лаабе ] </h1>
-        <h2> Добавить книгу </h2>
+        <h2> [ Библиотека Георга Лаабе ] </h2>
+        <h3> Добавить книгу </h3>
         <form method="POST" action="createBook">
             <input id="name" name="name" style="width: 200px;" maxlength="40" placeholder="Название" style="border-radius: 55px; margin: 20px" required><br>
             <input id="author" name="author" style="width: 200px;" maxlength="40" placeholder="Автор"style="border-radius: 3px; margin: 20px"  required><br>
