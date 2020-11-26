@@ -8,12 +8,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <style>
-            * {
-                margin: 3px;
-                padding: 3px;
-            }
-        </style>
+        <link type="text/css" rel="stylesheet" href="style.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Добавление книги</title>
     </head>
@@ -23,8 +18,9 @@
         <form method="POST" action="createBook">
             <input id="name" name="name" style="width: 200px;" maxlength="40" placeholder="Название" style="border-radius: 55px; margin: 20px" required><br>
             <input id="author" name="author" style="width: 200px;" maxlength="40" placeholder="Автор"style="border-radius: 3px; margin: 20px"  required><br>
-            <input id="year" name="year" style="width: 200px;" maxlength="4" placeholder="Год" style="border-radius: 3px; margin: 20px"  required><br>
+            <input type="number" id="year" name="year" style="width: 200px;" maxlength="5" placeholder="Год издания" style="border-radius: 3px; margin: 20px"  required><br>
             <input type="submit" value=" Подтвердить " style="border-radius: 3px;"><br>
+            <h2 style="color: red;"> ${error} </h2>
         </form>
     </body>
 </html>
