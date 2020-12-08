@@ -1,114 +1,81 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package entity;
 
 import java.io.Serializable;
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
+/**
+ *
+ * @author user
+ */
 @Entity
-public class User implements Serializable {    
+public class User implements Serializable, EntityInterface{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
-    private String name;
-    private String surname;
-    private String nick;
-    private String phone;
-            
-    public User() {       
+    private Long id;
+    private String login;
+    private String password;
+    @OneToOne
+    private Reader reader;
+
+    public User() {
     }
 
-    public User(String name, String surname, String nick, String phone) {       
-        this.name = name;
-        this.surname = surname;
-        this.nick = nick;
-        this.phone = phone;
+    public User(String login, String password, Reader reader) {
+        this.login = login;
+        this.password = password;
+        this.reader = reader;
     }
 
-    public String getPhone() {
-        return phone;
+    public Reader getReader() {
+        return reader;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setReader(Reader reader) {
+        this.reader = reader;
     }
 
-    public String getName() {
-        return name;
+    public String getLogin() {
+        return login;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getPassword() {
+        return password;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getNick() {
-        return nick;
-    }
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 23 * hash + Objects.hashCode(this.name);
-        hash = 23 * hash + Objects.hashCode(this.surname);
-        hash = 23 * hash + Objects.hashCode(this.nick);
-        hash = 23 * hash + Objects.hashCode(this.phone);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final User other = (User) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        if (!Objects.equals(this.surname, other.surname)) {
-            return false;
-        }
-        if (!Objects.equals(this.nick, other.nick)) {
-            return false;
-        }
-        if (!Objects.equals(this.phone, other.phone)) {
-            return false;
-        }
-        return true;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String toString() {
-        return "User{" + "name=" + name + ", surname=" + surname + ", nick=" + nick + ", phone=" + phone + '}';
-    }   
+        return "User{" 
+                + "login=" + login 
+                + ", password=" + password 
+                + ", reader=" + reader.getName()
+                + " " + reader.getLastname()
+                + '}';
+    }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
-    public void setId(Long Id) {
-        this.Id = Id;
+    public void setId(Long id) {
+        this.id = id;
     }
-    
     
     
 }

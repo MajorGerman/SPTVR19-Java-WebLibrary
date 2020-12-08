@@ -1,6 +1,6 @@
 <%-- 
     Document   : index
-    Created on : 24.11.2020, 14:32:31
+    Created on : Nov 24, 2020, 2:31:43 PM
     Author     : user
 --%>
 
@@ -10,15 +10,17 @@
     <head>
         <link type="text/css" rel="stylesheet" href="style.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Главная</title>
+        <title>Библиотека Георга Лаабе</title>
     </head>
     <body>
-        <h2> [ Библиотека Георга Лаабе ] </h2>
+        <div><strong><a style="font-size: 42px; text-decoration: none; color: #d9a34c;-webkit-text-stroke: 1px black;" href="index.jsp">Супер Библиотека</a></strong></div>
         <p>${info}</p>
-        <a href="addBook"> > Добавить книгу </a><br>
-        <a href="addUser"> > Добавить пользователя </a><br>
-        <a href="bookList"> > Список книг </a><br>      
+        <br>
+        <a href="addBook" onfocus="transform: scale(1.2);"> > Добавить новую книгу < </a><br>
+        <a href="addReader"> > Добавить читателя < </a><br>
+        <a href="listBooks"> > Список книг < </a><br>
+        <a href="listReaders"> > Список читателей < </a><br>
+        <a href="takeOnBookForm"> > Выдать книгу читателю < </a><br>
+        <a href="returnBookForm"> > Вернуть книгу < </a><br>
     </body>
-    <script>             
-    </script>
 </html>

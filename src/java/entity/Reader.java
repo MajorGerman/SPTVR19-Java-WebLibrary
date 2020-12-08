@@ -16,25 +16,23 @@ import javax.persistence.Id;
  * @author sillamae kutsekool
  */
 @Entity
-public class Book implements Serializable, EntityInterface{
+public class Reader implements Serializable, EntityInterface{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String author;
-    private Integer publishedYear;
+    private String lastname;
+    private String phone;
 
-    public Book() {
+    public Reader() {
     }
 
-    public Book(String name, String author, Integer publishedYear) {
+    public Reader(String name, String lastname, String phone) {
         this.name = name;
-        this.author = author;
-        this.publishedYear = publishedYear;
+        this.lastname = lastname;
+        this.phone = phone;
     }
-    
-    
-    
+
     public String getName() {
         return name;
     }
@@ -43,28 +41,28 @@ public class Book implements Serializable, EntityInterface{
         this.name = name;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
-    public Integer getPublishedYear() {
-        return publishedYear;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPublishedYear(Integer publishedYear) {
-        this.publishedYear = publishedYear;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
     public String toString() {
-        return "Book{" 
+        return "Reader{" 
                 + "name=" + name 
-                + ", author=" + author 
-                + ", publishedYear=" + publishedYear 
+                + ", lastname=" + lastname 
+                + ", phone=" + phone 
                 + '}';
     }
 
@@ -75,6 +73,6 @@ public class Book implements Serializable, EntityInterface{
     public void setId(Long id) {
         this.id = id;
     }
-    
-    
+      
+            
 }
