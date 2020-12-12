@@ -11,27 +11,25 @@
     <head>
         <link type="text/css" rel="stylesheet" href="style.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Выдать книгу</title>
+        <title>Купить товар</title>
     </head>
     <body>
         <div><strong><a style="font-size: 42px; text-decoration: none; color: #d9a34c;-webkit-text-stroke: 1px black;" href="index.jsp">Супер Библиотека</a></strong></div>
-        <h1>Выдать книгу</h1>
-        <form action="takeOnBook" method="POST">
-            <select name="bookId">
-                <option value="">Выберите книгу</option>
-                <c:forEach var="book" items="${listBooks}">
-                    <option value="${book.id}">"${book.name}". ${book.author}. ${book.publishedYear} </option>
+        <h1>Купить товар</h1>
+        <form action="buyProduct" method="POST">
+            <select name="productId" multiple="true">
+                <c:forEach var="product" items="${listProducts}">
+                    <option value="${product.id}">${product.name} (${product.price}$)</option>
                 </c:forEach>
             </select>
             <br>
-            <select name="readerId">
-                <option value="">Список читателей</option>
-                <c:forEach var="reader" items="${listReaders}">
-                    <option value="${reader.id}">"${reader.name}". ${reader.lastname}. ${reader.phone} </option>
+            <select name="persId" multiple="true">
+                <c:forEach var="pers" items="${listPersons}">
+                    <option value="${pers.id}">"${pers.name}" ${pers.surname} (${pers.money}$) </option>
                 </c:forEach>
             </select>    
             <br>
-            <input type="submit" value="Выдать книгу">
+            <input type="submit" value="Купить товар">
         </form>    
     </body>
 </html>

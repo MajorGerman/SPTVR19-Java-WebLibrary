@@ -10,17 +10,19 @@
     <head>
         <link type="text/css" rel="stylesheet" href="style.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Библиотека Георга Лаабе</title>
+        <title>Магазин Георга Лаабе</title>
     </head>
     <body>
-        <div><strong><a style="font-size: 42px; text-decoration: none; color: #d9a34c;-webkit-text-stroke: 1px black;" href="index.jsp">Супер Библиотека</a></strong></div>
-        <p>${info}</p>
-        <br>
-        <a href="addBook" onfocus="transform: scale(1.2);"> > Добавить новую книгу < </a><br>
-        <a href="addReader"> > Добавить читателя < </a><br>
-        <a href="listBooks"> > Список книг < </a><br>
-        <a href="listReaders"> > Список читателей < </a><br>
-        <a href="takeOnBookForm"> > Выдать книгу читателю < </a><br>
-        <a href="returnBookForm"> > Вернуть книгу < </a><br>
+        <div><strong><a style="font-size: 42px; text-decoration: none; color: #d9a34c;-webkit-text-stroke: 1px black;" href="index.jsp"><<< Магазин Георга Лаабе >>></a></strong></div>
+        <p style="border-style: groove; border-width: ${borderwidth}0px; border-color: #d9a34c;">${info}</p>
+        <a href="addProductForm"> > Добавить новый товар < </a><br>
+        <a href="listProducts"> > Список товаров < </a><br>
+        <a href="editProductForm1"> > Изменить товар < </a><br><br>
+        <a href="addPersonForm"> > Добавить нового покупателя < </a><br>
+        <a href="listPersons"> > Список покупателей < </a><br>
+        <a href="editPersonForm1"> > Изменить данные покупателя < </a><br><br>
+        <a href="buyProductForm"> > Купить товар < </a><br>      
+
     </body>
+    
 </html>
