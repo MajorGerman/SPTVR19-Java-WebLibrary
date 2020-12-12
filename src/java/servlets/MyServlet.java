@@ -5,6 +5,7 @@ import entity.PersonFacade;
 import entity.Product;
 import entity.ProductFacade;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
@@ -72,20 +73,26 @@ public class MyServlet extends HttpServlet {
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
                 break;
             case "/listProducts":
-                List<Product> listProducts = productFacade.findAll();
-                for (int i = 0; i < listProducts.size(); i++) {
-                    if (listProducts.get(i).isAccess() != true) {
-                        listProducts.remove(i);
+                List<Product> listProductsOr = productFacade.findAll();
+                List<Product> listProducts = new ArrayList<>();
+                if (listProductsOr.size() > 0) {
+                    for (int i = 0; i < listProductsOr.size(); i++) {
+                        if (listProductsOr.get(i).isAccess() == true) {
+                            listProducts.add(listProductsOr.get(i));
+                        }
                     }
                 }
                 request.setAttribute("listProducts", listProducts);
                 request.getRequestDispatcher("/WEB-INF/listProducts.jsp").forward(request, response);
                 break;
             case "/editProductForm1":
-                listProducts = productFacade.findAll();
-                for (int i = 0; i < listProducts.size(); i++) {
-                    if (listProducts.get(i).isAccess() != true) {
-                        listProducts.remove(i);
+                listProductsOr = productFacade.findAll();
+                listProducts = new ArrayList<>();
+                if (listProductsOr.size() > 0) {
+                    for (int i = 0; i < listProductsOr.size(); i++) {
+                        if (listProductsOr.get(i).isAccess() == true) {
+                            listProducts.add(listProductsOr.get(i));
+                        }
                     }
                 }
                 request.setAttribute("listProducts", listProducts);
@@ -162,8 +169,7 @@ public class MyServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/listPersons.jsp").forward(request, response);
                 break;
             case "/editPersonForm1":
-                listPersons = personFacade.findAll();
-                
+                listPersons = personFacade.findAll();                
                 request.setAttribute("listPersons", listPersons);
                 request.getRequestDispatcher("/WEB-INF/editPersonForm1.jsp").forward(request, response);
             case "/editPersonForm2":                  
@@ -205,12 +211,20 @@ public class MyServlet extends HttpServlet {
                 pers.setMoney(Integer.parseInt(money));
                 personFacade.edit(pers);
                 request.setAttribute("personId", pers.getId());
-                request.setAttribute("info","Данные покупателя успешно отредактированы: " + pers.toString());
+                request.setAttribute("info","Данные покупателя успешно отредактированы: " + pers.getName() + " " + pers.getSurname() + "(" + pers.getMoney() + "$)");
                 request.setAttribute("borderwidth",6.5);
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
                 break;                
             case "/buyProductForm":
-                listProducts = productFacade.findAll();
+                listProductsOr = productFacade.findAll();
+                listProducts = new ArrayList<>();
+                if (listProductsOr.size() > 0) {
+                    for (int i = 0; i < listProductsOr.size(); i++) {
+                        if (listProductsOr.get(i).isAccess() == true) {
+                            listProducts.add(listProductsOr.get(i));
+                        }
+                    }
+                }
                 request.setAttribute("listProducts", listProducts);
                 listPersons = personFacade.findAll();
                 request.setAttribute("listPersons", listPersons);
