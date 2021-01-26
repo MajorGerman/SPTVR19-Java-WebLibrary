@@ -1,6 +1,5 @@
 * {
-    margin: 10px;
-    padding: 2px;
+    margin: 8px;
     border-radius: 4px;
     font-family: arial;
     font-size: 36px;
@@ -21,4 +20,18 @@ input {
 
 a {
     text-decoration: none;
+    transition: 0.35s;
+}
+
+a:hover {
+    font-size: 37px;
+}
+
+input[type='submit'] {
+    transition: 0.35s;
+}
+
+
+input[type='submit']:hover {
+    transform: scale(1.08);
 }

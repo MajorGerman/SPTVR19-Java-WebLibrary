@@ -11,18 +11,20 @@
     <head>
         <link type="text/css" rel="stylesheet" href="style.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Изменить данные покупателя</title>
+        <title> ~ Изменить данные покупателя ~ </title>
     </head>
     <body>
         <div><strong><a style="font-size: 42px; text-decoration: none; color: #d9a34c;-webkit-text-stroke: 1px black;" href="index.jsp"><<< Магазин Георга Лаабе >>></a></strong></div>
-        <h1>Изменить данные покупателя:</h1>
+        <h6 style="font-size: 32px;" ${hiddenlogout}hidden> ${upuser}</h6>
+        <a href="logout" ${hiddenlogout}hidden style="font-size: 29px;"> > Выйти < </a> 
+        <hr><h1> ~ Изменить данные покупателя ~ </h1>
         <form action="editPersonForm2" method="POST">
             <select name="personId" multiple="true">
                 <c:forEach var="pers" items="${listPersons}">
                     <option value="${pers.id}">${pers.name} ${pers.surname} (${pers.money}$)</option>
                 </c:forEach>
             </select>
-            <input type="submit" value="Изменить">
+            <br><input type="submit" value="Изменить">
         </form>
     </body>
 </html>

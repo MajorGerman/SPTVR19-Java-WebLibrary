@@ -4,28 +4,24 @@ import entity.Person;
 import entity.PersonFacade;
 import entity.Product;
 import entity.ProductFacade;
+import entity.RoleFacade;
+import entity.User;
+import entity.UserFacade;
+import entity.UserRolesFacade;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-@WebServlet(name = "MyServlet", urlPatterns = {
-    "/addProductForm",
-    "/addProduct",
-    "/listProducts",
-    "/editProductForm1",
-    "/editProductForm2",
-    "/editProduct",
-    "/addPersonForm",
-    "/addPerson",
-    "/listPersons",
+@WebServlet(name = "UserServlet", urlPatterns = {
     "/editPersonForm1",
     "/editPersonForm2",
     "/editPerson",
@@ -33,16 +29,43 @@ import javax.servlet.http.HttpServletResponse;
     "/buyProduct"
 
 })
-public class MyServlet extends HttpServlet {
+public class UserServlet extends HttpServlet {
     @EJB 
     private ProductFacade productFacade;
     @EJB 
     private PersonFacade personFacade;
+    @EJB 
+    private UserFacade userFacade;
+    @EJB 
+    private RoleFacade roleFacade;
+    @EJB 
+    private UserRolesFacade userRolesFacade;
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            request.setAttribute("info","У вас нет прав! Войдите в систему!");
+            request.setAttribute("borderwidth",6.5);
+            request.getRequestDispatcher("/WEB-INF/loginForm.jsp").forward(request, response);
+            return;          
+        }
+        User user = (User)session.getAttribute("user");
+        if (user == null) {
+            request.setAttribute("info","У вас нет прав! Войдите в систему!");
+            request.setAttribute("borderwidth",6.5);
+            request.getRequestDispatcher("/WEB-INF/loginForm.jsp").forward(request, response);
+            return;                     
+        }
+        boolean isRole = userRolesFacade.isRole("customer", user);
+        if (!isRole) {
+            request.setAttribute("info","У вас нет прав!");
+            request.setAttribute("borderwidth",6.5);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            return;               
+        }
         String path = request.getServletPath();
         
         switch (path) {
@@ -139,16 +162,22 @@ public class MyServlet extends HttpServlet {
                 String surname = request.getParameter("surname");
                 String phone = request.getParameter("phone");
                 String money = request.getParameter("money");
+                String login = request.getParameter("login");
+                String password = request.getParameter("password");
                 if("".equals(name) || name == null
                         || "".equals(surname) || surname == null
                         || "".equals(phone) || phone == null
-                        || "".equals(money) || money == null){
-                    request.setAttribute("info","Заполните все поля формы");
+                        || "".equals(money) || money == null
+                        || "".equals(login) || login == null
+                        || "".equals(password) || password == null ){
+                    request.setAttribute("info","Заполните все поля формы!");
                     request.setAttribute("borderwidth",6.5);
                     request.setAttribute("name",name);
                     request.setAttribute("surname",surname);
                     request.setAttribute("phone",phone);
-                    request.setAttribute("money",money);                   
+                    request.setAttribute("money",money);     
+                    request.setAttribute("login",login);     
+                    request.setAttribute("password",password);     
                     request.getRequestDispatcher("/WEB-INF/addPersonForm.jsp").forward(request, response);
                     break; 
                 } else if (Integer.parseInt(money) < 1) {
@@ -156,9 +185,11 @@ public class MyServlet extends HttpServlet {
                     request.setAttribute("borderwidth",6.5);          
                     request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
                     break;                     
-                }
+                }           
                 Person pers = new Person(name, surname, phone, Integer.parseInt(money));
                 personFacade.create(pers);
+                user = new User(login, password, pers);
+                userFacade.create(user);
                 request.setAttribute("info","Добавлен пользователь: " + pers.toString());
                 request.setAttribute("borderwidth",6.5);
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
@@ -169,14 +200,31 @@ public class MyServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/listPersons.jsp").forward(request, response);
                 break;
             case "/editPersonForm1":
+                isRole = userRolesFacade.isRole("admin", user);
+                if (!isRole) {
+                    String personId = user.getPerson().getId().toString();
+                    pers = personFacade.find(Long.parseLong(personId));
+                    request.setAttribute("pers", pers);
+                    request.getRequestDispatcher("/WEB-INF/editPersonForm2.jsp").forward(request, response);
+                    break;
+                }
                 listPersons = personFacade.findAll();                
                 request.setAttribute("listPersons", listPersons);
                 request.getRequestDispatcher("/WEB-INF/editPersonForm1.jsp").forward(request, response);
-            case "/editPersonForm2":                  
-                String personId = request.getParameter("personId");
-                pers = personFacade.find(Long.parseLong(personId));
-                request.setAttribute("pers", pers);
-                request.getRequestDispatcher("/WEB-INF/editPersonForm2.jsp").forward(request, response);
+                break;
+            case "/editPersonForm2":          
+                isRole = userRolesFacade.isRole("admin", user);
+                if (!isRole) {
+                    String personId = user.getPerson().getId().toString();
+                    pers = personFacade.find(Long.parseLong(personId));
+                    request.setAttribute("pers", pers);
+                    request.getRequestDispatcher("/WEB-INF/editPersonForm2.jsp").forward(request, response);  
+                    break;
+                }
+                    String personId = request.getParameter("personId");
+                    pers = personFacade.find(Long.parseLong(personId));
+                    request.setAttribute("pers", pers);
+                    request.getRequestDispatcher("/WEB-INF/editPersonForm2.jsp").forward(request, response);
                 break;               
             case "/editPerson":
                 personId = request.getParameter("persId");
@@ -186,16 +234,19 @@ public class MyServlet extends HttpServlet {
                 surname = request.getParameter("surname");
                 phone = request.getParameter("phone");
                 money = request.getParameter("money");
+                password = request.getParameter("password");
                 if("".equals(name) || name == null
                         || "".equals(surname) || surname == null
                         || "".equals(phone) || phone == null
-                        || "".equals(money) || money == null){
+                        || "".equals(money) || money == null
+                        || "".equals(password) || password == null){
                     request.setAttribute("info","Заполните все поля формы");
                     request.setAttribute("borderwidth",6.5);
                     request.setAttribute("name",name);
                     request.setAttribute("surname",surname);
                     request.setAttribute("phone",phone);
                     request.setAttribute("money",money); 
+                    request.setAttribute("password", password); 
                     request.setAttribute("personId", pers.getId()); 
                     request.getRequestDispatcher("/WEB-INF/editPersonForm2.jsp").forward(request, response);
                     break; 
@@ -209,14 +260,25 @@ public class MyServlet extends HttpServlet {
                 pers.setSurname(surname);
                 pers.setPhone(phone);
                 pers.setMoney(Integer.parseInt(money));
+                user.setPassword(password); 
                 personFacade.edit(pers);
+                userFacade.edit(user);
+                user = userFacade.findByLogin(user.getLogin());
+                session.setAttribute("user", user);
+                session.setAttribute("upuser", session.getAttribute("user").toString()); 
                 request.setAttribute("personId", pers.getId());
-                request.setAttribute("info","Данные покупателя успешно отредактированы: " + pers.getName() + " " + pers.getSurname() + "(" + pers.getMoney() + "$)");
+                request.setAttribute("info","Данные успешно отредактированы: " + pers.getName() + " " + pers.getSurname() + "(" + pers.getMoney() + "$)");
                 request.setAttribute("borderwidth",6.5);
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
                 break;                
             case "/buyProductForm":
                 listProductsOr = productFacade.findAll();
+                if (listProductsOr.size() == 0) {
+                    request.setAttribute("info","Товаров в данный момент нет!");
+                    request.setAttribute("borderwidth",6.5);
+                    request.getRequestDispatcher("/index.jsp").forward(request, response);      
+                    break;
+                }
                 listProducts = new ArrayList<>();
                 if (listProductsOr.size() > 0) {
                     for (int i = 0; i < listProductsOr.size(); i++) {
@@ -226,24 +288,37 @@ public class MyServlet extends HttpServlet {
                     }
                 }
                 request.setAttribute("listProducts", listProducts);
-                listPersons = personFacade.findAll();
-                request.setAttribute("listPersons", listPersons);
                 request.getRequestDispatcher("/WEB-INF/buyProductForm.jsp").forward(request, response);
                 break;
             case "/buyProduct":
-                personId = request.getParameter("persId");
+                personId = user.getPerson().getId().toString();
                 pers = personFacade.find(Long.parseLong(personId));
                 productId = request.getParameter("productId");
                 product = productFacade.find(Long.parseLong(productId));               
                 if (pers.getMoney() < product.getPrice()) {
                     request.setAttribute("info","У покупателя недостаточно денег!");
                     request.setAttribute("borderwidth",6.5); 
+                    listProductsOr = productFacade.findAll();
+                    listProducts = new ArrayList<>();
+                    if (listProductsOr.size() > 0) {
+                        for (int i = 0; i < listProductsOr.size(); i++) {
+                            if (listProductsOr.get(i).isAccess() == true) {
+                                listProducts.add(listProductsOr.get(i));
+                            }
+                        }
+                    }
+                    request.setAttribute("listProducts", listProducts);
+                    listPersons = personFacade.findAll();
                     request.getRequestDispatcher("/WEB-INF/buyProductForm.jsp").forward(request, response);
                     break; 
                 }
                 pers.setMoney(pers.getMoney() - product.getPrice());
                 pers.getListProducts().add(product);
                 personFacade.edit(pers);
+                userFacade.edit(user);
+                user = userFacade.findByLogin(user.getLogin());
+                session.setAttribute("user", user);
+                session.setAttribute("upuser", session.getAttribute("user").toString()); 
                 product.setAccess(false);
                 productFacade.edit(product);
                 request.setAttribute("info", "Товар '" + product.getName() + "' успешно куплен покупателем " + pers.getName() + " " + pers.getSurname() + "!");
