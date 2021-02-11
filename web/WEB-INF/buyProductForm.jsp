@@ -27,5 +27,16 @@
             </select>
             <br><input type="submit" value=" Купить ">
         </form>    
+        <p>
+            <c:forEach var="product" items="${listProducts2}">
+            <div>
+                <h2> ${product.name}</h2>
+                <img src="${product.cover.path}>
+                <h4> ${product.cover.description} </h4>
+                <button value=" Изучить " href="">
+            </div>
+            </c:forEach>
+            
+        </p>
     </body>
 </html>

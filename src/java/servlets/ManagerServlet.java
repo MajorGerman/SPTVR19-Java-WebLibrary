@@ -1,36 +1,35 @@
 package servlets;
 
+import entity.CoverFacade;
 import entity.Person;
-import entity.Person;
-import entity.PersonFacade;
-import entity.PersonFacade;
 import entity.PersonFacade;
 import entity.Product;
-import entity.Product;
-import entity.Product;
-import entity.ProductFacade;
-import entity.ProductFacade;
 import entity.ProductFacade;
 import entity.RoleFacade;
 import entity.User;
-import entity.User;
-import entity.User;
-import entity.UserFacade;
-import entity.UserFacade;
 import entity.UserFacade;
 import entity.UserRolesFacade;
+import entity.Cover;
+import entity.ProductFile;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 @WebServlet(name = "ManagerServlet", urlPatterns = {
     "/addProductForm",
@@ -41,6 +40,7 @@ import javax.servlet.http.HttpSession;
 
 
 })
+@MultipartConfig
 public class ManagerServlet extends HttpServlet {
     @EJB 
     private ProductFacade productFacade;
@@ -52,6 +52,8 @@ public class ManagerServlet extends HttpServlet {
     private RoleFacade roleFacade;
     @EJB 
     private UserRolesFacade userRolesFacade;
+    @EJB 
+    private CoverFacade coverFacade;
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -87,12 +89,38 @@ public class ManagerServlet extends HttpServlet {
             case "/addProduct":
                 String name = request.getParameter("name");
                 String price = request.getParameter("price");
+                
+                ////////////////
+                String uploadFolder = "E:\\UploadFolder";
+                List<Part> fileParts = request
+                    .getParts()
+                    .stream()
+                    .filter(part -> "file".equals(part.getName()))
+                    .collect(Collectors.toList());
+                StringBuffer sb = new StringBuffer();
+                for(Part filePart : fileParts){
+                    sb.append(uploadFolder + File.separator + getFileName(filePart));
+                    File file = new File(sb.toString());
+                    try(InputStream fileContent = filePart.getInputStream()){
+                        Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+                String description = request.getParameter("description");
+                Cover cover = new Cover(description, sb.toString());
+                String coverId = request.getParameter("coverId");
+                coverFacade.create(cover);
+                ////////////////
+
                 if("".equals(name) || name == null 
-                        || "".equals(price) || price == null){
+                        || "".equals(price) || price == null
+                        || "".equals(description) || description == null
+                        || cover == null){
                     request.setAttribute("info","Заполните все поля формы");
                     request.setAttribute("borderwidth",6.5);
                     request.setAttribute("name",name);
                     request.setAttribute("price",price);
+                    request.setAttribute("cover",cover);
+                    request.setAttribute("description",description);
                     request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
                     break; 
                 } else if (Integer.parseInt(price) < 1) {
@@ -101,7 +129,7 @@ public class ManagerServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
                     break;                     
                 }
-                Product product = new Product(name, Integer.parseInt(price));
+                Product product = new Product(name, Integer.parseInt(price), cover);
                 productFacade.create(product);
                 request.setAttribute("info","Добавлен товар: " + product.toString() );
                 request.setAttribute("borderwidth",6.5);
@@ -194,5 +222,16 @@ public class ManagerServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    private String getFileName(Part part){
+        final String partHeader = part.getHeader("content-disposition");
+        for (String content : part.getHeader("content-disposition").split(";")){
+            if(content.trim().startsWith("filename")){
+                return content
+                        .substring(content.indexOf('=')+1)
+                        .trim()
+                        .replace("\"",""); 
+            }
+        }
+        return null;
+    }
 }

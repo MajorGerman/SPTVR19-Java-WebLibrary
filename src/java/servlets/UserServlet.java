@@ -1,5 +1,9 @@
 package servlets;
 
+import entity.Cover;
+import entity.CoverFacade;
+import entity.History;
+import entity.HistoryFacade;
 import entity.Person;
 import entity.PersonFacade;
 import entity.Product;
@@ -40,7 +44,11 @@ public class UserServlet extends HttpServlet {
     private RoleFacade roleFacade;
     @EJB 
     private UserRolesFacade userRolesFacade;
-    
+    @EJB 
+    private HistoryFacade historyFacade;
+    @EJB 
+    private CoverFacade coverFacade;
+     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -75,6 +83,7 @@ public class UserServlet extends HttpServlet {
             case "/addProduct":
                 String name = request.getParameter("name");
                 String price = request.getParameter("price");
+                String coverId = request.getParameter("coverId");
                 if("".equals(name) || name == null 
                         || "".equals(price) || price == null){
                     request.setAttribute("info","Заполните все поля формы");
@@ -89,7 +98,8 @@ public class UserServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
                     break;                     
                 }
-                Product product = new Product(name, Integer.parseInt(price));
+                Cover cover = coverFacade.find(Long.parseLong(coverId));
+                Product product = new Product(name, Integer.parseInt(price), cover);
                 productFacade.create(product);
                 request.setAttribute("info","Добавлен товар: " + product.toString() );
                 request.setAttribute("borderwidth",6.5);
@@ -287,6 +297,8 @@ public class UserServlet extends HttpServlet {
                         }
                     }
                 }
+                List<History> listProducts2 = historyFacade.findBoughtProducts(user.getPerson());
+                request.setAttribute("listProducts2", listProducts);
                 request.setAttribute("listProducts", listProducts);
                 request.getRequestDispatcher("/WEB-INF/buyProductForm.jsp").forward(request, response);
                 break;
@@ -320,6 +332,8 @@ public class UserServlet extends HttpServlet {
                 session.setAttribute("user", user);
                 session.setAttribute("upuser", session.getAttribute("user").toString()); 
                 product.setAccess(false);
+                History history = new History(product, pers, new GregorianCalendar().getTime(), null);
+                historyFacade.create(history);
                 productFacade.edit(product);
                 request.setAttribute("info", "Товар '" + product.getName() + "' успешно куплен покупателем " + pers.getName() + " " + pers.getSurname() + "!");
                 request.setAttribute("borderwidth",6.5); 

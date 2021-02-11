@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Product implements Serializable{
@@ -14,12 +15,23 @@ public class Product implements Serializable{
     private Long id;
     private String name;
     private int price;
+    @OneToOne
+    private Cover cover;
     private boolean access;
 
-    public Product(String name, int price) {
+    public Cover getCover() {
+        return cover;
+    }
+
+    public void setCover(Cover cover) {
+        this.cover = cover;
+    }
+
+    public Product(String name, int price, Cover cover) {
         this.name = name;
         this.price = price;
         this.access = true;
+        this.cover = cover;
     }
     
     public Product() {
