@@ -3,9 +3,11 @@ package servlets;
 import entity.Person;
 import entity.PersonFacade;
 import entity.ProductFacade;
+import entity.Role;
 import entity.RoleFacade;
 import entity.User;
 import entity.UserFacade;
+import entity.UserRoles;
 import entity.UserRolesFacade;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,7 +25,8 @@ import javax.servlet.http.HttpSession;
  * @author Georg
  */
 @WebServlet(name = "AdminServlet", urlPatterns = {
-    "/listPersons"
+    "/listPersons",
+    "/madeManager"
 
 
 
@@ -52,33 +55,49 @@ public class AdminServlet extends HttpServlet {
         
         if (session == null) {
             request.setAttribute("info","У вас нет прав! Войдите в систему!");
-            request.setAttribute("borderwidth",6.5);
-            request.getRequestDispatcher("/WEB-INF/loginForm.jsp").forward(request, response);
+            request.getRequestDispatcher("/loginForm").forward(request, response);
             return;          
         }
         User user = (User)session.getAttribute("user");
         if (user == null) {
             request.setAttribute("info","У вас нет прав! Войдите в систему!");
-            request.setAttribute("borderwidth",6.5);
-            request.getRequestDispatcher("/WEB-INF/loginForm.jsp").forward(request, response);
+            request.getRequestDispatcher("/loginForm").forward(request, response);
             return;                     
         }
         boolean isRole = userRolesFacade.isRole("admin", user);
         if (!isRole) {
             request.setAttribute("info","У вас нет прав!");
-            request.setAttribute("borderwidth",6.5);
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            request.getRequestDispatcher("/index").forward(request, response);
             return;               
         }
         String path = request.getServletPath();
         
         switch (path) {
             case "/listPersons":
-                List<Person> listPersons = personFacade.findAll();
-                request.setAttribute("listPersons", listPersons);
-                request.getRequestDispatcher("/WEB-INF/listPersons.jsp").forward(request, response);
+                List<User> listUsers = userFacade.findAll();
+                request.setAttribute("listUsers", listUsers);
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
                 break;
-            case "":
+            case "/madeManager":
+                String userId = request.getParameter("userId");
+                user = userFacade.find(Long.parseLong(userId));
+                isRole = userRolesFacade.isRole("manager", user);
+                if (isRole) {
+                    listUsers = userFacade.findAll();
+                    request.setAttribute("listUsers", listUsers);
+                    request.setAttribute("info", "Пользователь уже является менеджером!");
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
+                    break;                    
+                }
+                if (user != null ) {
+                UserRoles userRoles = new UserRoles(user, roleFacade.findByName("manager"));
+                userRolesFacade.create(userRoles);
+                listUsers = userFacade.findAll();
+                request.setAttribute("listUsers", listUsers);
+                request.setAttribute("info", "Пользователь успешно сделан менеджером!");
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
+                break;
+                }
         }
     }
 

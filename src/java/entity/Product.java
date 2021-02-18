@@ -1,6 +1,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ public class Product implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private List<String> tags;
     private String name;
     private int price;
     @OneToOne
@@ -106,6 +108,15 @@ public class Product implements Serializable{
     public void setAccess(boolean access) {
         this.access = access;
     }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+    
     
     
 }

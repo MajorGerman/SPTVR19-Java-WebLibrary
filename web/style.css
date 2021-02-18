@@ -1,37 +1,70 @@
-* {
-    margin: 8px;
-    border-radius: 4px;
-    font-family: arial;
-    font-size: 36px;
-    color: #d9a34c;
-    -webkit-text-stroke: 1px black;
-    font-weight: bold;
-}
-
 body {
-    background-color: gold;
     text-align: center;
 }
 
-input {
-    color: gold;
-    background-color: #d9a34c;
+* {
+    margin: 8px;
+    padding: 2px;
+    margin: auto;
+}
+
+#title {
+    text-decoration: none;
+    color: black;
+    font-size: 32px;
 }
 
 a {
     text-decoration: none;
-    transition: 0.35s;
+    color: black;
+    font-size: 1.35em;
 }
 
-a:hover {
-    font-size: 37px;
+#loginbut {
+    font-size: 28px;
+    text-decoration: none;
+    color: grey;
 }
 
-input[type='submit'] {
-    transition: 0.35s;
+#index-body {
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
+#navbar {
+    height: 75px;
+}
 
-input[type='submit']:hover {
-    transform: scale(1.08);
+footer {
+    height: 10px;   
+    padding-top: 180px;
+    padding-bottom: 20px;
+}
+
+.at-magnifier-wrapper {
+    height: 0px;
+}
+
+#carouselExampleControls {
+    width: 825px;
+}
+
+#exampleInputEmail1 {
+    width: 35%;
+    margin: auto;
+}
+
+#exampleInputPassword1 {
+    width: 35%;
+    margin: auto;
+}
+
+.list-group {
+    width: 0%;
+    text-align: center;
+    justify-content: center;
+}
+
+.list-group-item {
+    min-width: 200px;
 }

@@ -62,33 +62,31 @@ public class ManagerServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null) {
             request.setAttribute("info","У вас нет прав! Войдите в систему!");
-            request.setAttribute("borderwidth",6.5);
-            request.getRequestDispatcher("/WEB-INF/loginForm.jsp").forward(request, response);
+            request.getRequestDispatcher("/loginForm").forward(request, response);
             return;          
         }
         User user = (User)session.getAttribute("user");
         if (user == null) {
             request.setAttribute("info","У вас нет прав! Войдите в систему!");
-            request.setAttribute("borderwidth",6.5);
-            request.getRequestDispatcher("/WEB-INF/loginForm.jsp").forward(request, response);
+            request.getRequestDispatcher("/loginForm").forward(request, response);
             return;               
         }
         boolean isRole = userRolesFacade.isRole("manager", user);
         if (!isRole) {
             request.setAttribute("info","Эта функция доступна только менеджерам!");
-            request.setAttribute("borderwidth",6.5);
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            request.getRequestDispatcher("/index").forward(request, response);
             return;               
         }
         String path = request.getServletPath();
-        
+        request.setAttribute("managerhidden", "xxxx");
         switch (path) {
             case "/addProductForm":
-                request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("addProductForm")).forward(request, response);
                 break;
             case "/addProduct":
                 String name = request.getParameter("name");
                 String price = request.getParameter("price");
+                String tag = request.getParameter("tag");
                 
                 ////////////////
                 String uploadFolder = "E:\\UploadFolder";
@@ -114,26 +112,27 @@ public class ManagerServlet extends HttpServlet {
                 if("".equals(name) || name == null 
                         || "".equals(price) || price == null
                         || "".equals(description) || description == null
-                        || cover == null){
+                        || cover == null || tag == null || "".equals(tag)){
                     request.setAttribute("info","Заполните все поля формы");
-                    request.setAttribute("borderwidth",6.5);
                     request.setAttribute("name",name);
                     request.setAttribute("price",price);
                     request.setAttribute("cover",cover);
+                    request.setAttribute("tag", tag);
                     request.setAttribute("description",description);
-                    request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("addProductForm")).forward(request, response);
                     break; 
                 } else if (Integer.parseInt(price) < 1) {
-                    request.setAttribute("info","Цена не может быть меньше 1$!");
-                    request.setAttribute("borderwidth",6.5);          
-                    request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
+                    request.setAttribute("info","Цена не может быть меньше 1$!");        
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("addProductForm")).forward(request, response);
                     break;                     
                 }
                 Product product = new Product(name, Integer.parseInt(price), cover);
+                List<String> tags = new ArrayList<>();
+                tags.add(tag);
+                product.setTags(tags);
                 productFacade.create(product);
                 request.setAttribute("info","Добавлен товар: " + product.toString() );
-                request.setAttribute("borderwidth",6.5);
-                request.getRequestDispatcher("/index.jsp").forward(request, response);
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("index")).forward(request, response);
                 break;
             case "/editProductForm1":
                 List<Product> listProductsOr = productFacade.findAll();
@@ -146,12 +145,12 @@ public class ManagerServlet extends HttpServlet {
                     }
                 }
                 request.setAttribute("listProducts", listProducts);
-                request.getRequestDispatcher("/WEB-INF/editProductForm1.jsp").forward(request, response);
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm1")).forward(request, response);
             case "/editProductForm2":                  
                 String productId = request.getParameter("productId");
                 product = productFacade.find(Long.parseLong(productId));
                 request.setAttribute("product", product);
-                request.getRequestDispatcher("/WEB-INF/editProductForm2.jsp").forward(request, response);
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm2")).forward(request, response);
                 break;               
             case "/editProduct":
                 productId = request.getParameter("productId");
@@ -161,16 +160,14 @@ public class ManagerServlet extends HttpServlet {
                 price = request.getParameter("price");
                 if("".equals(name) || name == null || "".equals(price) || price == null){
                     request.setAttribute("info","Заполните все поля формы");
-                    request.setAttribute("borderwidth",6.5);
                     request.setAttribute("name",name);
                     request.setAttribute("price",price);
                     request.setAttribute("productId", product.getId()); 
-                    request.getRequestDispatcher("/WEB-INF/editProductForm2.jsp").forward(request, response);
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm2")).forward(request, response);
                     break; 
                 } else if (Integer.parseInt(price) < 1) {
-                    request.setAttribute("info","Цена не может быть меньше 1$!");
-                    request.setAttribute("borderwidth",6.5);          
-                    request.getRequestDispatcher("/WEB-INF/addProductForm.jsp").forward(request, response);
+                    request.setAttribute("info","Цена не может быть меньше 1$!");    
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm2")).forward(request, response);
                     break;    
                 }   
                 product.setName(name);
@@ -178,8 +175,7 @@ public class ManagerServlet extends HttpServlet {
                 productFacade.edit(product);
                 request.setAttribute("productId", product.getId());
                 request.setAttribute("info","Товар успешно отредактирован: " + product.toString() );
-                request.setAttribute("borderwidth",6.5);
-                request.getRequestDispatcher("/index.jsp").forward(request, response);
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("index")).forward(request, response);
                 break;                  
 
         }
