@@ -7,7 +7,7 @@
         </ul>
         <ul class="list-group list-group-horizontal">            
             <li class="list-group-item disabled">Деньги</li>
-            <li class="list-group-item">${money}</li>
+            <li class="list-group-item">${money}$</li>
         </ul>
         <ul class="list-group list-group-horizontal">            
             <li class="list-group-item disabled">Имя</li>

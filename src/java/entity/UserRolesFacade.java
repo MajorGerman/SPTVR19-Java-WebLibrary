@@ -37,4 +37,14 @@ public class UserRolesFacade extends AbstractFacade<UserRoles> {
         }
     }
     
+    public UserRoles findByUserAndRoleName(User user, String roleName) {
+        try {
+            return (UserRoles) em.createQuery("SELECT u FROM UserRoles u WHERE u.user = :user AND u.role.roleName = :roleName")
+                    .setParameter("user", user)
+                    .setParameter("roleName", roleName)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }  
 }

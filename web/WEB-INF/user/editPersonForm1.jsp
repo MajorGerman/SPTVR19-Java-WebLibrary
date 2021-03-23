@@ -5,6 +5,6 @@
             <option value="${pers.id}">${user.login} (${pers.name} ${pers.surname} | ${pers.money}$)</option>
         </c:forEach>       
     </select>
-    <button type="submit" class="btn btn-primary"> Готово </button>
+    <button type="submit" class="btn btn-primary"> Изменить </button>
 </form>
 

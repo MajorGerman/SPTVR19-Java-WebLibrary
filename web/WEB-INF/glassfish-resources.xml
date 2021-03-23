@@ -7,7 +7,7 @@
         <property name="databaseName" value="sptvr19laabejavawebshop"/>
         <property name="User" value="sptvr19laabejavawebshop"/>
         <property name="Password" value="sptvr19laabejavawebshop"/>
-        <property name="URL" value="jdbc:mysql://localhost:3306/sptvr19laabejavawebshop?zeroDateTimeBehavior=convertToNull"/>
+        <property name="URL" value="jdbc:mysql://localhost:3306/sptvr19laabejavawebshop?zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=utf8"/>
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
     </jdbc-connection-pool>
     <jdbc-resource enabled="true" jndi-name="java:app/sptvr19laabejavawebshop" object-type="user" pool-name="mysql_sptvr19laabejavawebshop_sptvr19laabejavawebshopPool"/>

@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import javax.servlet.http.Part;
     "/editProductForm1",
     "/editProductForm2",
     "/editProduct",
+    "/deleteProduct"
 
 
 })
@@ -144,6 +146,11 @@ public class ManagerServlet extends HttpServlet {
                         }
                     }
                 }
+                if (listProducts.isEmpty()) {
+                    request.setAttribute("info","Товаров в данный момент нет!");
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("index")).forward(request, response);      
+                    break;
+                }   
                 request.setAttribute("listProducts", listProducts);
                 request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm1")).forward(request, response);
             case "/editProductForm2":                  
@@ -154,14 +161,43 @@ public class ManagerServlet extends HttpServlet {
                 break;               
             case "/editProduct":
                 productId = request.getParameter("productId");
-                product = productFacade.find(Long.parseLong(productId));
-                request.setAttribute("product", product);
                 name = request.getParameter("name");
                 price = request.getParameter("price");
-                if("".equals(name) || name == null || "".equals(price) || price == null){
+                tag = request.getParameter("tags");
+                description = request.getParameter("description");
+                
+                //////////////////////////////////////
+
+                uploadFolder = "E:\\UploadFolder";
+                
+                fileParts = request
+                    .getParts()
+                    .stream()
+                    .filter(part -> "file".equals(part.getName()))
+                    .collect(Collectors.toList());
+                sb = new StringBuffer();
+                for(Part filePart : fileParts){
+                    sb.append(uploadFolder + File.separator + getFileName(filePart));
+                    File file = new File(sb.toString());
+                    try(InputStream fileContent = filePart.getInputStream()){
+                        Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }                             
+                ///////////////////////////////////////////////
+                
+                product = productFacade.find(Long.parseLong(productId));
+                request.setAttribute("product", product);
+                
+                if("".equals(name) || name == null 
+                        || "".equals(price) || price == null 
+                        || "".equals(description) || description == null
+                        || "".equals(tag) || tag == null
+                        || "".equals(sb.toString()) || sb.toString() == null){
                     request.setAttribute("info","Заполните все поля формы");
-                    request.setAttribute("name",name);
-                    request.setAttribute("price",price);
+                    request.setAttribute("name", name);
+                    request.setAttribute("price", price);
+                    request.setAttribute("tags", tag);
+                    request.setAttribute("description", description);
                     request.setAttribute("productId", product.getId()); 
                     request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm2")).forward(request, response);
                     break; 
@@ -172,12 +208,34 @@ public class ManagerServlet extends HttpServlet {
                 }   
                 product.setName(name);
                 product.setPrice(Integer.parseInt(price));
+                product.getTags().clear();
+                product.getTags().add(tag);
+                cover = new Cover(description, sb.toString());
+                product.setCover(cover);
                 productFacade.edit(product);
                 request.setAttribute("productId", product.getId());
                 request.setAttribute("info","Товар успешно отредактирован: " + product.toString() );
                 request.getRequestDispatcher(LoginServlet.pathToJsp.getString("index")).forward(request, response);
-                break;                  
-
+                break;    
+            case "/deleteProduct":
+                productId = request.getParameter("productId");
+                product = productFacade.find(Long.parseLong(productId));
+                product.setAccess(false);
+                productFacade.edit(product);
+                
+                listProductsOr = productFacade.findAll();
+                listProducts = new ArrayList<>();
+                if (listProductsOr.size() > 0) {
+                    for (int i = 0; i < listProductsOr.size(); i++) {
+                        if (listProductsOr.get(i).isAccess() == true) {
+                            listProducts.add(listProductsOr.get(i));
+                        }
+                    }
+                }
+                request.setAttribute("listProducts", listProducts);
+                
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("editProductForm1")).forward(request, response);
+                break;                 
         }
     }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

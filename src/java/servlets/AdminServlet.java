@@ -26,7 +26,9 @@ import javax.servlet.http.HttpSession;
  */
 @WebServlet(name = "AdminServlet", urlPatterns = {
     "/listPersons",
-    "/madeManager"
+    "/makeManager",
+    "/makeAdmin",
+    "/makeNobody"
 
 
 
@@ -75,28 +77,78 @@ public class AdminServlet extends HttpServlet {
         switch (path) {
             case "/listPersons":
                 List<User> listUsers = userFacade.findAll();
+                listUsers.remove(0);
                 request.setAttribute("listUsers", listUsers);
                 request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
                 break;
-            case "/madeManager":
+            case "/makeManager":
                 String userId = request.getParameter("userId");
                 user = userFacade.find(Long.parseLong(userId));
                 isRole = userRolesFacade.isRole("manager", user);
                 if (isRole) {
                     listUsers = userFacade.findAll();
+                    listUsers.remove(0);
                     request.setAttribute("listUsers", listUsers);
                     request.setAttribute("info", "Пользователь уже является менеджером!");
                     request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
                     break;                    
                 }
-                if (user != null ) {
+                if (user != null) {
                 UserRoles userRoles = new UserRoles(user, roleFacade.findByName("manager"));
                 userRolesFacade.create(userRoles);
                 listUsers = userFacade.findAll();
+                listUsers.remove(0);
                 request.setAttribute("listUsers", listUsers);
                 request.setAttribute("info", "Пользователь успешно сделан менеджером!");
                 request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
                 break;
+                }
+            case "/makeAdmin":
+                userId = request.getParameter("userId");
+                user = userFacade.find(Long.parseLong(userId));
+                isRole = userRolesFacade.isRole("admin", user);
+                if (isRole) {
+                    listUsers = userFacade.findAll();
+                    listUsers.remove(0);
+                    request.setAttribute("listUsers", listUsers);
+                    request.setAttribute("info", "Пользователь уже является админом!");
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
+                    break;                    
+                }
+                if (user != null) {
+                UserRoles userRoles = new UserRoles(user, roleFacade.findByName("admin"));
+                userRolesFacade.create(userRoles);
+                listUsers = userFacade.findAll();
+                listUsers.remove(0);
+                request.setAttribute("listUsers", listUsers);
+                request.setAttribute("info", "Пользователь успешно сделан админом!");
+                request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
+                break;
+                }
+            case "/makeNobody":
+                userId = request.getParameter("userId");
+                user = userFacade.find(Long.parseLong(userId));
+                isRole = userRolesFacade.isRole("admin", user);
+                boolean isRole2 = userRolesFacade.isRole("manager", user);
+                if (!isRole && !isRole2) {
+                    listUsers = userFacade.findAll();
+                    listUsers.remove(0);
+                    request.setAttribute("listUsers", listUsers);
+                    request.setAttribute("info", "Пользователь и так не имеет прав!");
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
+                    break;                    
+                }
+                if (user != null) {
+                    UserRoles userRoles = userRolesFacade.findByUserAndRoleName(user, "manager");
+                    userRolesFacade.remove(userRoles);
+                    userRoles = userRolesFacade.findByUserAndRoleName(user, "admin");
+                    userRolesFacade.remove(userRoles);
+                    listUsers = userFacade.findAll();
+                    listUsers.remove(0);
+                    request.setAttribute("listUsers", listUsers);
+                    request.setAttribute("info", "Пользователь успешно разжалован!");
+                    request.getRequestDispatcher(LoginServlet.pathToJsp.getString("listPersons")).forward(request, response);
+                    break;
                 }
         }
     }
